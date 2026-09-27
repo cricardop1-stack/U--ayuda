@@ -3,73 +3,276 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>U-Ayuda - Cipriam Ricardo</title>
+<title>U-Ayuda</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',system-ui,sans-serif}
-body{background:#f8f7ff;color:#1a1a2e;padding-bottom:90px}
-header{background:white;position:sticky;top:0;z-index:10;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 10px rgba(0,0,0,0.05)}
-.logo{font-weight:900;font-size:20px}
-.search-bar{margin:12px 16px;background:#fff3c4;padding:12px 16px;border-radius:20px;display:flex;gap:8px}
-.search-bar input{border:none;background:transparent;width:100%;outline:none}
-.cta-box{margin:16px;border:2px dashed #6c5ce7;border-radius:20px;padding:24px 20px;text-align:center;background:white}
-.btn-primary{background:#5a4bd1;color:white;border:none;padding:14px 24px;border-radius:14px;font-weight:700;width:100%;cursor:pointer}
-.card{background:white;margin:0 16px 16px;border-radius:20px;padding:18px;box-shadow:0 4px 20px rgba(0,0,0,0.06)}
-.badge{display:inline-block;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:700;margin-right:6px}
-.badge-hum{background:#e0d8ff;color:#5a4bd1}
-.badge-views{background:#fff3c4;color:#8a6d00}
-.card h3{margin:12px 0 8px;font-size:17px}
-.card.autor{font-size:13px;color:#666;margin-bottom:10px;font-weight:600}
-.card.desc{font-size:14px;color:#444;line-height:1.5;margin-bottom:12px}
-.link{color:#5a4bd1;font-weight:700;text-decoration:underline;font-size:14px;display:block;margin-bottom:12px}
-.btn-view{background:#f1f0ff;border:none;width:100%;padding:12px;border-radius:12px;font-weight:700;cursor:pointer}
-.fab{position:fixed;bottom:90px;right:20px;width:60px;height:60px;background:#5a4bd1;color:white;border:none;border-radius:50%;font-size:30px;box-shadow:0 8px 24px rgba(90,75,209,0.4);cursor:pointer;z-index:20}
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:white;display:flex;justify-content:space-around;padding:12px 0 20px;border-top:1px solid #eee;z-index:10}
-.nav-item{font-size:12px;color:#888;text-decoration:none;font-weight:600;background:none;border:none;cursor:pointer}
-.nav-item.active{color:#5a4bd1}
-.modal{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:white;z-index:100;overflow-y:auto;padding:20px}
-.modal.active{display:block}
-.hidden{display:none}
-.stat-box{background:white;margin:0 16px 12px;padding:16px;border-radius:16px;display:flex;justify-content:space-between;box-shadow:0 2px 10px rgba(0,0,0,0.05)}
-.stat-num{font-size:24px;font-weight:900;color:#5a4bd1}
-input,textarea,select{width:100%;padding:14px;border:2px solid #eee;border-radius:12px;margin-bottom:14px;outline:none}
+body{margin:0;font-family:Arial;background:#f8fafc;color:#1e293b;padding-bottom:80px}
+header{position:sticky;top:0;z-index:10;background:white;padding:12px 15px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 5px rgba(0,0,0,.1)}
+#sidebar{position:fixed;top:0;left:-300px;width:280px;height:100%;background:white;z-index:100;transition:0.3s;overflow-y:auto;padding:20px}
+#sidebar.abierta{left:0}
+#overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);z-index:90;display:none}
+#overlay.abierta{display:block}
+#sidebar a{display:block;padding:13px;text-decoration:none;color:#1e293b;border-bottom:1px solid #f1f5f9}
+.container{padding:15px}
+.hero{background:linear-gradient(135deg,#4f46e5,#06b6d4);color:white;border-radius:20px;padding:22px;text-align:center}
+.card{background:white;border-radius:15px;padding:18px;margin-bottom:15px;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.btn{background:#4f46e5;color:white;border:none;padding:13px;border-radius:12px;width:100%;font-weight:bold;cursor:pointer}
+.btn-plus{background:#4f46e5;color:white;border:none;width:60px;height:60px;border-radius:50%;font-size:32px;position:fixed;bottom:80px;right:20px;box-shadow:0 4px 15px rgba(79,70,229,.4);z-index:40}
+input,select,textarea{width:100%;padding:12px;margin:7px 0;border-radius:10px;border:1px solid #cbd5e1;box-sizing:border-box}
+.hidden{display:none!important}
+.bottom-nav{position:fixed;bottom:0;left:0;width:100%;background:white;display:flex;justify-content:space-around;padding:8px 0 12px;box-shadow:0 -2px 10px rgba(0,0,0,.1);z-index:50}
+.active{color:#4f46e5;font-weight:bold}
+.login-box{min-height:90vh;display:flex;flex-direction:column;justify-content:center;padding:20px;background:white}
+.destacado{border-left:5px solid #f59e0b}
+.badge-vistas{background:#fef3c7;color:#92400e;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:bold}
+.modal{position:fixed;top:0;left:0;right:0;bottom:0;background:white;z-index:200;overflow-y:auto;padding:20px;display:none}
+.modal.activo{display:block}
 </style>
 </head>
 <body>
-<header><div>☰</div><div class="logo">U-Ayuda</div><div>🎓</div></header>
-<div class="search-bar">🔍 <input id="buscador" placeholder="Buscar textos..." oninput="filtrar()"></div>
 
-<div id="pantalla-principal">
-<div class="cta-box"><h2>¿Quieres aportar?</h2><p>Sube tu artículo y ayuda a otros</p><button class="btn-primary" onclick="abrirModal()">➕ comparte tus ideas</button></div>
-<div style="padding:0 16px;margin:20px 0 12px;font-weight:800">📚 Todos los textos</div>
-<div id="lista-articulos"></div>
+<div id="loginScreen" class="login-box">
+<h1 style="color:#4f46e5;text-align:center">🎓 U-Ayuda</h1>
+<div class="card">
+<h3>Ingresar</h3>
+<input id="lCorreo" placeholder="Correo">
+<input id="lNombre" placeholder="Nombre completo">
+<input id="lUsuario" placeholder="Usuario">
+<input id="lInstitucion" placeholder="Institución">
+<input id="lCarrera" placeholder="Carrera">
+<button class="btn" onclick="iniciarSesion()">Ingresar</button>
+</div>
 </div>
 
-<div id="pantalla-disciplinas" class="hidden"><div style="padding:0 16px;margin:20px 0 12px;font-weight:800">📚 Disciplinas</div><div id="lista-disciplinas"></div></div>
-<div id="pantalla-perfil" class="hidden"><div style="padding:0 16px;margin:20px 0 12px;font-weight:800">👤 Perfil</div><div style="text-align:center;padding:10px"><h3>Cipriam Rafael Ricardo Padilla</h3><small>San Antero, Córdoba</small></div><div class="stat-box"><span>Aportes</span><span class="stat-num" id="stat-aportes">0</span></div><div class="stat-box"><span>Vistas recibidas</span><span class="stat-num" id="stat-vistas">0</span></div><div class="stat-box"><span>Leídos</span><span class="stat-num" id="stat-leidos">0</span></div><div id="historial"></div></div>
+<div id="appPrincipal" class="hidden">
+<header>
+<span onclick="abrirMenu()" style="font-size:28px;cursor:pointer">☰</span>
+<h3 id="headerNombre">U-Ayuda</h3>
+<span>🎓</span>
+</header>
 
-<button class="fab" onclick="abrirModal()">+</button>
+<div id="overlay" onclick="cerrarMenu()"></div>
+<div id="sidebar">
+<h3 id="sideUser">Hola</h3>
+<a href="#" onclick="irA('principal');return false;">🏠 Principal</a>
+<a href="#" onclick="abrirDisciplina('Humanidades');return false;">📖 Humanidades</a>
+<a href="#" onclick="abrirDisciplina('Ciencias Sociales');return false;">👥 Sociales</a>
+<a href="#" onclick="abrirDisciplina('Ciencias Naturales');return false;">🌿 Naturales</a>
+<a href="#" onclick="abrirDisciplina('Ciencias Exactas');return false;">🔢 Exactas</a>
+<a href="#" onclick="abrirDisciplina('Ciencias Económicas');return false;">💰 Económicas</a>
+<a href="#" onclick="abrirDisciplina('Ciencias Políticas');return false;">🏛️ Políticas</a>
+<a href="#" onclick="abrirDisciplina('Ingeniería');return false;">⚙️ Ingeniería</a>
+<a href="#" onclick="abrirDisciplina('Tecnología');return false;">💻 Tecnología</a>
+<a href="#" onclick="abrirDisciplina('Ciencias de la Salud');return false;">🩺 Salud</a>
+<a href="#" onclick="abrirDisciplina('Educación');return false;">🎓 Educación</a>
+<a href="#" onclick="abrirDisciplina('Artes');return false;">🎨 Artes</a>
+<a href="#" onclick="abrirDisciplina('Agro');return false;">🌾 Agro</a>
+<a href="#" onclick="irA('perfil');return false;">👤 Mi Perfil</a>
+<a href="#" onclick="cerrarSesion();return false;" style="color:red">🚪 Cerrar Sesión</a>
+</div>
+
+<div class="container">
+<div id="principal">
+<div class="hero"><h2>¡Aquí nos ayudamos!</h2><p>Hoy por ti, mañana por mí.</p></div>
+
+<div class="card" style="background:linear-gradient(135deg,#fffbeb,#fef3c7);border:1px solid #fcd34d">
+<h3>🔥 Artículos más destacados</h3>
+<p style="font-size:13px;color:gray">Los que más han leído personas diferentes.</p>
+<div id="listaDestacados"></div>
+</div>
+
+<div class="card" style="text-align:center;border:2px dashed #4f46e5">
+<h3>¿Quieres aportar?</h3>
+<p>Sube tu artículo y ayuda a otros</p>
+<button class="btn" onclick="irA('crear')">➕ Crear Artículo</button>
+</div>
+
+<h3>📚 Todos los artículos</h3>
+<div id="listaPrincipal"></div>
+</div>
+
+<div id="disciplinaSec" class="hidden">
+<div class="card"><h2 id="tituloDisc"></h2><input id="buscadorDisc" onkeyup="filtrar()" placeholder="Buscar..."></div>
+<div id="listaDisc"></div>
+</div>
+
+<div id="crear" class="hidden">
+<div class="card">
+<h2>➕ Nuevo Artículo</h2>
+<input id="nTitulo" placeholder="Título">
+<select id="nCat">
+<option value="">Selecciona disciplina</option>
+<option>Humanidades</option><option>Ciencias Sociales</option><option>Ciencias Naturales</option><option>Ciencias Exactas</option><option>Ciencias Económicas</option><option>Ciencias Políticas</option><option>Ingeniería</option><option>Tecnología</option><option>Ciencias de la Salud</option><option>Educación</option><option>Artes</option><option>Agro</option>
+</select>
+<input id="nAutor" placeholder="Nombre completo del autor">
+<textarea id="nDesc" placeholder="Descripción corta"></textarea>
+<select id="tipoContenido" onchange="cambiarTipo()">
+<option value="texto">📝 Texto / Resumen</option>
+<option value="link">🔗 Enlace externo</option>
+<option value="pdf">📄 PDF</option>
+</select>
+<div id="campoTexto"><textarea id="nResumen" rows="5" placeholder="Pega tu texto aquí"></textarea></div>
+<div id="campoLink" class="hidden"><input id="nLink" placeholder="https://..."></div>
+<div id="campoPdf" class="hidden"><input id="nPdfLink" placeholder="Link del PDF de Drive"></div>
+<button class="btn" onclick="crearArticulo()">Publicar</button>
+<button class="btn" style="background:#e2e8f0;color:#1e293b;margin-top:8px" onclick="irA('principal')">Cancelar</button>
+</div>
+</div>
+
+<div id="perfil" class="hidden">
+<div class="card">
+<h2>👤 Mi Perfil</h2>
+<p><b>Correo:</b> <span id="pCorreo"></span></p>
+<p><b>Usuario:</b> <span id="pUsuario"></span></p>
+<p><b>Artículos:</b> <span id="pArticulos">0</span> | <b>Vistas reales (personas):</b> <span id="pVistas">0</span></p>
+<button class="btn" style="background:#ef4444" onclick="cerrarSesion()">Cerrar sesión</button>
+</div>
+</div>
+</div>
+
+<button class="btn-plus" onclick="irA('crear')">+</button>
 <div class="bottom-nav">
-<button class="nav-item active" id="nav-principal" onclick="cambiarTab('principal')">🏠 Principal</button>
-<button class="nav-item" id="nav-disciplinas" onclick="cambiarTab('disciplinas')">📚 Disciplinas</button>
-<button class="nav-item" id="nav-perfil" onclick="cambiarTab('perfil')">👤 Perfil</button>
+<div onclick="irA('principal')" id="nav-principal" class="active">🏠<br>Principal</div>
+<div onclick="abrirMenu()" id="nav-disciplinas">📚<br>Disciplinas</div>
+<div onclick="irA('perfil')" id="nav-perfil">👤<br>Perfil</div>
+</div>
 </div>
 
-<div id="modal-crear" class="modal"><div style="display:flex;justify-content:space-between"><h2>Nuevo aporte</h2><button onclick="cerrarModal()" style="font-size:24px;background:#f1f0ff;border:none;width:40px;height:40px;border-radius:50%">×</button></div><br>
-<input id="titulo" placeholder="Título"><input id="autor" value="Cipriam Rafael Ricardo Padilla"><select id="categoria"><option>Humanidades</option><option>Ciencias</option><option>Tecnologia</option></select><textarea id="descripcion" rows="3" placeholder="Descripción corta"></textarea><textarea id="contenido" rows="5" placeholder="Contenido completo"></textarea><input id="enlace" placeholder="Link Drive opcional"><button class="btn-primary" onclick="guardarArticulo()">Publicar</button></div>
-
-<div id="modal-lectura" class="modal"><div style="display:flex;justify-content:space-between"><h2 id="lectura-titulo"></h2><button onclick="cerrarLectura()" style="font-size:24px;background:#f1f0ff;border:none;width:40px;height:40px;border-radius:50%">×</button></div><p id="lectura-meta" style="color:#666;font-size:13px;margin:10px 0"></p><p id="lectura-desc" style="line-height:1.6;white-space:pre-wrap"></p><a id="lectura-link" target="_blank" style="display:none;margin-top:20px;color:#5a4bd1;font-weight:700">🔗 Ver enlace</a></div>
+<div id="modalLectura" class="modal">
+<div style="display:flex;justify-content:space-between;align-items:center"><h2 id="mTitulo"></h2><button onclick="cerrarLectura()" style="font-size:28px;border:none;background:#f1f5f9;width:40px;height:40px;border-radius:50%">×</button></div>
+<p id="mMeta" style="color:gray;font-size:13px;margin-top:8px"></p>
+<p id="mDesc" style="margin-top:12px;line-height:1.6;white-space:pre-wrap"></p>
+<div id="mContenido" style="background:#f8fafc;padding:12px;border-radius:10px;margin-top:12px;white-space:pre-wrap"></div>
+<a id="mLink" target="_blank" class="btn" style="display:none;margin-top:16px;text-align:center;text-decoration:none">🔗 Abrir enlace / PDF</a>
+<p id="mAviso" style="margin-top:16px;font-size:12px;color:#16a34a;font-weight:bold"></p>
+</div>
 
 <script>
-let articulos = JSON.parse(localStorage.getItem('uayuda_articulos')) || [{
-id:1,titulo:"La relación entre el uso excesivo de la IA y la perdida del conocimiento critico en jóvenes",autor:"Cipriam Rafael Ricardo Padilla",categoria:"Humanidades",descripcion:"Esta pequeña propuesta busca hallar si existe relación entre la pérdida de habilidades cognitivas con el uso excesivo de la IA",contenido:"Objetivo: Analizar cómo el uso desmedido de herramientas de IA afecta el pensamiento crítico en jóvenes.\\nMetodología: Encuestas.",enlace:"",vistas:7,fecha:new Date().toISOString()}];
-let historial=JSON.parse(localStorage.getItem('uayuda_historial'))||[];let vistasRecientes=JSON.parse(localStorage.getItem('uayuda_vistas_recientes'))||{};
-function guardarLS(){localStorage.setItem('uayuda_articulos',JSON.stringify(articulos));localStorage.setItem('uayuda_historial',JSON.stringify(historial));localStorage.setItem('uayuda_vistas_recientes',JSON.stringify(vistasRecientes));}
-function render(lista=articulos){let html=lista.map(a=>`<div class="card"><span class="badge badge-hum">${a.categoria}</span><span class="badge badge-views">👁️ ${a.vistas}</span><h3>${a.titulo}</h3><div class="autor">${a.autor}</div><div class="desc">${a.descripcion}</div>${a.enlace?`<a class="link" href="${a.enlace}" target="_blank">🔗 Ver enlace</a>`:''}<button class="btn-view" onclick="abrirYSumarVista(${a.id})">👁️ Abrir y sumar vista</button></div>`).join('');document.getElementById('lista-articulos').innerHTML=html;document.getElementById('lista-disciplinas').innerHTML=html;document.getElementById('stat-aportes').innerText=articulos.length;document.getElementById('stat-vistas').innerText=articulos.reduce((s,a)=>s+a.vistas,0);document.getElementById('stat-leidos').innerText=historial.length;document.getElementById('historial').innerHTML=historial.map(x=>`<div class="card"><b>${x.titulo}</b><br><small>${x.fecha}</small></div>`).join('')||'<p style="padding:0 16px;color:#888">Aún no has leído nada</p>';}
-function abrirYSumarVista(id){let ahora=Date.now();let ultima=vistasRecientes[id]||0;let art=articulos.find(x=>x.id===id);if(ahora-ultima>5*60*1000 && art){art.vistas++;vistasRecientes[id]=ahora;guardarLS();}document.getElementById('lectura-titulo').innerText=art.titulo;document.getElementById('lectura-meta').innerText=art.autor+' • '+art.categoria+' • '+art.vistas+' vistas';document.getElementById('lectura-desc').innerText=art.contenido+"\\n\\n"+art.descripcion;let l=document.getElementById('lectura-link');if(art.enlace){l.href=art.enlace;l.style.display='block';l.innerText='🔗 Abrir enlace';}else{l.style.display='none';}document.getElementById('modal-lectura').classList.add('active');if(!historial.find(h=>h.id===id)){historial.unshift({id:art.id,titulo:art.titulo,fecha:new Date().toLocaleDateString()});guardarLS();}}
-function filtrar(){let b=document.getElementById('buscador').value.toLowerCase();let f=articulos.filter(a=>a.titulo.toLowerCase().includes(b)||a.autor.toLowerCase().includes(b));render(f);}
-function abrirModal(){document.getElementById('modal-crear').classList.add('active');}function cerrarModal(){document.getElementById('modal-crear').classList.remove('active');}function cerrarLectura(){document.getElementById('modal-lectura').classList.remove('active');render();}
-function guardarArticulo(){let t=document.getElementById('titulo').value.trim();let a=document.getElementById('autor').value.trim();let c=document.getElementById('categoria').value;let d=document.getElementById('descripcion').value.trim();let co=document.getElementById('contenido').value.trim();let e=document.getElementById('enlace').value.trim();if(!t||!d){alert('Título y descripción');return;}articulos.unshift({id:Date.now(),titulo:t,autor:a,categoria:c,descripcion:d,contenido:co||d,enlace:e,vistas:0,fecha:new Date().toISOString()});guardarLS();cerrarModal();render();cambiarTab('principal');}
-function cambiarTab(tab){document.getElementById('pantalla-principal').classList.add('hidden');document.getElementById('pantalla-disciplinas').classList.add('hidden');document.getElementById('pantalla-perfil').classList.add('hidden');document.getElementById('pantalla-'+tab).classList.remove('hidden');document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));document.getElementById('nav-'+tab).classList.add('active');}
+let articulos = JSON.parse(localStorage.getItem('articulosU')||'[]');
+// ESTO GUARDA QUÉ PERSONA YA VIO QUÉ ARTÍCULO - SOLO 1 VEZ EN LA VIDA
+let articulosVistosPorMi = JSON.parse(localStorage.getItem('articulosVistosPorMi')||'[]');
+
+function cambiarTipo(){
+ let t=tipoContenido.value;
+ campoTexto.classList.add('hidden');campoLink.classList.add('hidden');campoPdf.classList.add('hidden');
+ if(t=='texto') campoTexto.classList.remove('hidden');
+ if(t=='link') campoLink.classList.remove('hidden');
+ if(t=='pdf') campoPdf.classList.remove('hidden');
+}
+function iniciarSesion(){
+ let correo=lCorreo.value.trim(), nombre=lNombre.value.trim(), usuario=lUsuario.value.trim();
+ if(!correo||!nombre||!usuario){alert("Llena correo, nombre y usuario");return}
+ localStorage.setItem('sesionUActiva',JSON.stringify({correo,nombre,usuario}));
+ mostrarApp({correo,usuario});
+}
+function mostrarApp(sesion){
+ loginScreen.classList.add('hidden');
+ appPrincipal.classList.remove('hidden');
+ headerNombre.innerText="U-Ayuda"; // YA NO DICE Cprmxx3x
+ sideUser.innerText="Hola, "+sesion.usuario;
+ pCorreo.innerText=sesion.correo;
+ pUsuario.innerText=sesion.usuario;
+ renderPrincipal();
+}
+function cerrarSesion(){localStorage.removeItem('sesionUActiva');location.reload()}
+window.onload=function(){
+ let s=localStorage.getItem('sesionUActiva');
+ if(s) mostrarApp(JSON.parse(s));
+};
+function abrirMenu(){sidebar.classList.add('abierta');overlay.classList.add('abierta')}
+function cerrarMenu(){sidebar.classList.remove('abierta');overlay.classList.remove('abierta')}
+function irA(id){
+ principal.classList.add('hidden');disciplinaSec.classList.add('hidden');crear.classList.add('hidden');perfil.classList.add('hidden');
+ document.getElementById(id).classList.remove('hidden');
+ document.querySelectorAll('.bottom-nav div').forEach(d=>d.classList.remove('active'));
+ if(document.getElementById('nav-'+id)) document.getElementById('nav-'+id).classList.add('active');
+ cerrarMenu();
+ if(id=='principal') renderPrincipal();
+ if(id=='perfil') actualizarPerfil();
+}
+function abrirDisciplina(cat){
+ tituloDisc.innerText=cat;
+ irA('disciplinaSec');
+ renderLista(articulos.filter(a=>a.cat==cat),'listaDisc');
+}
+function renderPrincipal(){
+ renderLista(articulos,'listaPrincipal');
+ renderDestacados();
+ actualizarPerfil();
+}
+function actualizarPerfil(){
+ document.getElementById('pArticulos').innerText=articulos.length;
+ document.getElementById('pVistas').innerText=articulos.reduce((s,a)=>s+(a.vistas||0),0);
+}
+function renderDestacados(){
+ let cont=document.getElementById('listaDestacados');
+ if(articulos.length==0){cont.innerHTML='<small style="color:gray">Aún no hay artículos</small>';return}
+ let ordenados=[...articulos].sort((a,b)=>(b.vistas||0)-(a.vistas||0)).slice(0,3);
+ cont.innerHTML=ordenados.map(a=>`
+  <div class="card destacado" style="margin:10px 0">
+   <span class="badge-vistas">👁️ ${a.vistas||0} personas • 🔥 Destacado</span>
+   <h3 style="margin:8px 0">${a.titulo}</h3>
+   <small>${a.cat} | ${a.autor}</small>
+   <p style="font-size:13px">${a.desc}</p>
+   <button class="btn" style="background:#f1f5f9;color:#1e293b" onclick="verArticulo('${a.titulo.replace(/'/g,"\\'")}')">📖 Abrir artículo</button>
+  </div>
+ `).join('');
+}
+function renderLista(lista,contId){
+ let cont=document.getElementById(contId);
+ if(lista.length==0){cont.innerHTML='<div class="card">No hay artículos aún</div>';return}
+ cont.innerHTML=lista.map(a=>{
+  return `<div class="card">
+   <span style="background:#e0e7ff;padding:3px 8px;border-radius:10px;font-size:11px">${a.cat}</span> <span class="badge-vistas">👁️ ${a.vistas||0} personas</span>
+   <h3>${a.titulo}</h3><small>${a.autor}</small><p style="font-size:13px;margin-top:6px">${a.desc}</p>
+   <button class="btn" style="background:#f1f5f9;color:#1e293b;margin-top:10px" onclick="verArticulo('${a.titulo.replace(/'/g,"\\'")}')">📖 Abrir artículo</button>
+  </div>`;
+ }).join('');
+}
+function verArticulo(titulo){
+ let art=articulos.find(a=>a.titulo==titulo);
+ if(!art) return;
+
+ // 1. ABRIR PRIMERO
+ document.getElementById('mTitulo').innerText=art.titulo;
+ document.getElementById('mMeta').innerText=art.cat+" • "+art.autor+" • "+(art.vistas||0)+" personas lo han leído";
+ document.getElementById('mDesc').innerText=art.desc;
+ document.getElementById('mContenido').innerText=art.contenido||"";
+ let ml=document.getElementById('mLink');
+ if(art.link){ml.href=art.link;ml.style.display='block';} else {ml.style.display='none';}
+ document.getElementById('mAviso').innerText="";
+ document.getElementById('modalLectura').classList.add('activo');
+
+ // 2. LOGICA QUE PEDISTE: SOLO 1 VISTA POR PERSONA EN TODA LA VIDA
+ if(!articulosVistosPorMi.includes(titulo)){
+   art.vistas=(art.vistas||0)+1;
+   articulosVistosPorMi.push(titulo);
+   localStorage.setItem('articulosU',JSON.stringify(articulos));
+   localStorage.setItem('articulosVistosPorMi',JSON.stringify(articulosVistosPorMi));
+   document.getElementById('mMeta').innerText=art.cat+" • "+art.autor+" • "+(art.vistas||0)+" personas lo han leído";
+   document.getElementById('mAviso').innerText="✅ +1 vista contada (eres una persona nueva)";
+ } else {
+   document.getElementById('mAviso').innerText="ℹ️ Ya habías leído este artículo, no se suma otra vista (como pediste)";
+ }
+}
+function cerrarLectura(){document.getElementById('modalLectura').classList.remove('activo');renderPrincipal();}
+function crearArticulo(){
+ let titulo=nTitulo.value.trim(), cat=nCat.value, autor=nAutor.value.trim(), desc=nDesc.value.trim(), tipo=tipoContenido.value, contenido=nResumen.value.trim(), link="";
+ if(tipo=='link') link=nLink.value.trim();
+ if(tipo=='pdf') link=nPdfLink.value.trim();
+ if(!titulo||!cat||!autor||!desc){alert("Falta título, disciplina, autor y descripción");return}
+ let nuevo={titulo,cat,desc,contenido,autor,tipo,link,vistas:0};
+ articulos.unshift(nuevo);
+ localStorage.setItem('articulosU',JSON.stringify(articulos));
+ alert("Publicado en "+cat);
+ irA('principal');
+}
+function filtrar(){
+ let q=buscadorDisc.value.toLowerCase();
+ renderLista(articulos.filter(a=>a.cat==tituloDisc.innerText && a.titulo.toLowerCase().includes(q)),'listaDisc');
+}
+</script>
+</body>
+</html>lassList.remove('active'));document.getElementById('nav-'+tab).classList.add('active');}
 render();
 </script>
 </body>
