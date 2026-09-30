@@ -16,6 +16,9 @@ header{position:sticky;top:0;z-index:10;background:white;padding:12px 15px;displ
 .hero{background:linear-gradient(135deg,#4f46e5,#06b6d4);color:white;border-radius:20px;padding:22px;text-align:center}
 .card{background:white;border-radius:15px;padding:18px;margin-bottom:15px;box-shadow:0 2px 8px rgba(0,0,0,.05)}
 .btn{background:#4f46e5;color:white;border:none;padding:13px;border-radius:12px;width:100%;font-weight:bold;cursor:pointer}
+.btn-sec{background:#f1f5f9;color:#1e293b;border:none;padding:10px 12px;border-radius:10px;font-weight:bold;cursor:pointer}
+.btn-danger{background:#fee2e2;color:#dc2626;border:none;padding:10px 12px;border-radius:10px;font-weight:bold;cursor:pointer}
+.btn-edit{background:#e0f2fe;color:#0284c7;border:none;padding:10px 12px;border-radius:10px;font-weight:bold;cursor:pointer}
 .btn-plus{background:#4f46e5;color:white;border:none;width:60px;height:60px;border-radius:50%;font-size:32px;position:fixed;bottom:80px;right:20px;box-shadow:0 4px 15px rgba(79,70,229,.4);z-index:40}
 input,select,textarea{width:100%;padding:12px;margin:7px 0;border-radius:10px;border:1px solid #cbd5e1;box-sizing:border-box}
 .hidden{display:none!important}
@@ -74,19 +77,14 @@ input,select,textarea{width:100%;padding:12px;margin:7px 0;border-radius:10px;bo
 <div class="container">
 <div id="principal">
 <div class="hero"><h2>¡Aquí nos ayudamos!</h2><p>Hoy por ti, mañana por mí.</p></div>
-
 <div class="card" style="background:linear-gradient(135deg,#fffbeb,#fef3c7);border:1px solid #fcd34d">
 <h3>🔥 Artículos más destacados</h3>
-<p style="font-size:13px;color:gray">Los que más han leído personas diferentes.</p>
 <div id="listaDestacados"></div>
 </div>
-
 <div class="card" style="text-align:center;border:2px dashed #4f46e5">
 <h3>¿Quieres aportar?</h3>
-<p>Sube tu artículo y ayuda a otros</p>
 <button class="btn" onclick="irA('crear')">➕ Crear Artículo</button>
 </div>
-
 <h3>📚 Todos los artículos</h3>
 <div id="listaPrincipal"></div>
 </div>
@@ -98,7 +96,7 @@ input,select,textarea{width:100%;padding:12px;margin:7px 0;border-radius:10px;bo
 
 <div id="crear" class="hidden">
 <div class="card">
-<h2>➕ Nuevo Artículo</h2>
+<h2 id="tituloCrear">➕ Nuevo Artículo</h2>
 <input id="nTitulo" placeholder="Título">
 <select id="nCat">
 <option value="">Selecciona disciplina</option>
@@ -114,7 +112,7 @@ input,select,textarea{width:100%;padding:12px;margin:7px 0;border-radius:10px;bo
 <div id="campoTexto"><textarea id="nResumen" rows="5" placeholder="Pega tu texto aquí"></textarea></div>
 <div id="campoLink" class="hidden"><input id="nLink" placeholder="https://..."></div>
 <div id="campoPdf" class="hidden"><input id="nPdfLink" placeholder="Link del PDF de Drive"></div>
-<button class="btn" onclick="crearArticulo()">Publicar</button>
+<button class="btn" onclick="crearArticulo()" id="btnPublicar">Publicar</button>
 <button class="btn" style="background:#e2e8f0;color:#1e293b;margin-top:8px" onclick="irA('principal')">Cancelar</button>
 </div>
 </div>
@@ -124,8 +122,14 @@ input,select,textarea{width:100%;padding:12px;margin:7px 0;border-radius:10px;bo
 <h2>👤 Mi Perfil</h2>
 <p><b>Correo:</b> <span id="pCorreo"></span></p>
 <p><b>Usuario:</b> <span id="pUsuario"></span></p>
-<p><b>Artículos:</b> <span id="pArticulos">0</span> | <b>Vistas reales (personas):</b> <span id="pVistas">0</span></p>
-<button class="btn" style="background:#ef4444" onclick="cerrarSesion()">Cerrar sesión</button>
+<p><b>Mis artículos:</b> <span id="pArticulos">0</span> | <b>Vistas totales:</b> <span id="pVistas">0</span></p>
+<button class="btn" style="background:#ef4444;margin-top:10px" onclick="cerrarSesion()">Cerrar sesión</button>
+</div>
+
+<div class="card">
+<h3>📝 Mis artículos publicados</h3>
+<p style="font-size:12px;color:gray">Aquí puedes editar o borrar lo que tú has subido. Solo tú lo ves.</p>
+<div id="misArticulos"></div>
 </div>
 </div>
 </div>
@@ -150,6 +154,7 @@ input,select,textarea{width:100%;padding:12px;margin:7px 0;border-radius:10px;bo
 <script>
 let articulos = JSON.parse(localStorage.getItem('articulosU')||'[]');
 let articulosVistosPorMi = JSON.parse(localStorage.getItem('articulosVistosPorMi')||'[]');
+let indiceEditando = null; // para saber si estamos editando
 
 function cambiarTipo(){
  let t=tipoContenido.value;
@@ -158,11 +163,13 @@ function cambiarTipo(){
  if(t=='link') campoLink.classList.remove('hidden');
  if(t=='pdf') campoPdf.classList.remove('hidden');
 }
+function getSesion(){ return JSON.parse(localStorage.getItem('sesionUActiva')||'null'); }
+
 function iniciarSesion(){
  let correo=lCorreo.value.trim(), nombre=lNombre.value.trim(), usuario=lUsuario.value.trim();
  if(!correo||!nombre||!usuario){alert("Llena correo, nombre y usuario");return}
  localStorage.setItem('sesionUActiva',JSON.stringify({correo,nombre,usuario}));
- mostrarApp({correo,usuario});
+ mostrarApp({correo,nombre,usuario});
 }
 function mostrarApp(sesion){
  loginScreen.classList.add('hidden');
@@ -187,7 +194,8 @@ function irA(id){
  if(document.getElementById('nav-'+id)) document.getElementById('nav-'+id).classList.add('active');
  cerrarMenu();
  if(id=='principal') renderPrincipal();
- if(id=='perfil') actualizarPerfil();
+ if(id=='perfil') renderPerfil();
+ if(id=='crear' && indiceEditando===null){ tituloCrear.innerText="➕ Nuevo Artículo"; btnPublicar.innerText="Publicar"; }
 }
 function abrirDisciplina(cat){
  tituloDisc.innerText=cat;
@@ -197,11 +205,36 @@ function abrirDisciplina(cat){
 function renderPrincipal(){
  renderLista(articulos,'listaPrincipal');
  renderDestacados();
- actualizarPerfil();
 }
-function actualizarPerfil(){
- document.getElementById('pArticulos').innerText=articulos.length;
- document.getElementById('pVistas').innerText=articulos.reduce((s,a)=>s+(a.vistas||0),0);
+function renderPerfil(){
+ let sesion=getSesion();
+ if(!sesion) return;
+ let misArts = articulos.filter(a => a.ownerCorreo === sesion.correo || a.owner === sesion.usuario);
+ document.getElementById('pArticulos').innerText=misArts.length;
+ document.getElementById('pVistas').innerText=misArts.reduce((s,a)=>s+(a.vistas||0),0);
+ pCorreo.innerText=sesion.correo;
+ pUsuario.innerText=sesion.usuario;
+
+ let cont=document.getElementById('misArticulos');
+ if(misArts.length==0){
+  cont.innerHTML='<div style="text-align:center;padding:20px;color:gray"><p>Aún no has publicado nada</p><button class="btn" onclick="irA(\'crear\')">➕ Crear mi primer artículo</button></div>';
+  return;
+ }
+ cont.innerHTML=misArts.map((a, idxReal)=>{
+  let idxGlobal = articulos.indexOf(a);
+  return `<div class="card" style="border:1px solid #e2e8f0">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <span style="background:#e0e7ff;padding:3px 8px;border-radius:10px;font-size:11px">${a.cat}</span>
+      <span class="badge-vistas">👁️ ${a.vistas||0}</span>
+    </div>
+    <h3 style="margin:8px 0">${a.titulo}</h3>
+    <small style="color:gray">${a.desc.substring(0,80)}...</small>
+    <div style="display:flex;gap:8px;margin-top:12px">
+      <button class="btn-edit" style="flex:1" onclick="editarArticulo(${idxGlobal})">✏️ Editar</button>
+      <button class="btn-danger" style="flex:1" onclick="borrarArticulo(${idxGlobal})">🗑️ Borrar</button>
+    </div>
+  </div>`;
+ }).join('');
 }
 function renderDestacados(){
  let cont=document.getElementById('listaDestacados');
@@ -211,13 +244,12 @@ function renderDestacados(){
   let yaVisto = articulosVistosPorMi.includes(a.titulo);
   return `
   <div class="card destacado" style="margin:10px 0">
-   <span class="badge-vistas">👁️ ${a.vistas||0} personas • 🔥 Destacado</span> ${yaVisto ? '<span class="badge-visto">👁️ Visto</span>' : ''}
+   <span class="badge-vistas">👁️ ${a.vistas||0} • 🔥 Destacado</span> ${yaVisto? '<span class="badge-visto">👁️ Visto</span>' : ''}
    <h3 style="margin:8px 0">${a.titulo}</h3>
    <small>${a.cat} | ${a.autor}</small>
-   <p style="font-size:13px">${a.desc}</p>
-   <button class="btn" style="background:#f1f5f9;color:#1e293b" onclick="verArticulo('${a.titulo.replace(/'/g,"\\'")}')">📖 Abrir artículo</button>
-  </div>
- `}).join('');
+   <button class="btn-sec" style="width:100%;margin-top:10px" onclick="verArticulo('${a.titulo.replace(/'/g,"\\'")}')">📖 Abrir</button>
+  </div>`;
+ }).join('');
 }
 function renderLista(lista,contId){
  let cont=document.getElementById(contId);
@@ -225,18 +257,18 @@ function renderLista(lista,contId){
  cont.innerHTML=lista.map(a=>{
   let yaVisto = articulosVistosPorMi.includes(a.titulo);
   return `<div class="card">
-   <span style="background:#e0e7ff;padding:3px 8px;border-radius:10px;font-size:11px">${a.cat}</span> 
-   <span class="badge-vistas">👁️ ${a.vistas||0} personas</span>
-   ${yaVisto ? '<span class="badge-visto">👁️ Visto</span>' : ''}
-   <h3>${a.titulo}</h3><small>${a.autor}</small><p style="font-size:13px;margin-top:6px">${a.desc}</p>
-   <button class="btn" style="background:#f1f5f9;color:#1e293b;margin-top:10px" onclick="verArticulo('${a.titulo.replace(/'/g,"\\'")}')">📖 Abrir artículo</button>
+   <span style="background:#e0e7ff;padding:3px 8px;border-radius:10px;font-size:11px">${a.cat}</span>
+   <span class="badge-vistas">👁️ ${a.vistas||0}</span>
+   ${yaVisto? '<span class="badge-visto">👁️ Visto</span>' : ''}
+   <h3>${a.titulo}</h3><small>${a.autor}</small>
+   <p style="font-size:13px;margin-top:6px">${a.desc}</p>
+   <button class="btn-sec" style="width:100%;margin-top:10px" onclick="verArticulo('${a.titulo.replace(/'/g,"\\'")}')">📖 Abrir artículo</button>
   </div>`;
  }).join('');
 }
 function verArticulo(titulo){
  let art=articulos.find(a=>a.titulo==titulo);
  if(!art) return;
-
  document.getElementById('mTitulo').innerText=art.titulo;
  document.getElementById('mMeta').innerText=art.cat+" • "+art.autor+" • "+(art.vistas||0)+" personas lo han leído";
  document.getElementById('mDesc').innerText=art.desc;
@@ -244,13 +276,7 @@ function verArticulo(titulo){
  let ml=document.getElementById('mLink');
  if(art.link){ml.href=art.link;ml.style.display='block';} else {ml.style.display='none';}
  document.getElementById('modalLectura').classList.add('activo');
-
- // ESTILO TIPO SIMA - SOLO OJITO VISTO
- const htmlVisto = `<span style="display:inline-flex;align-items:center;gap:6px;color:#64748b;background:#f1f5f9;padding:7px 12px;border-radius:20px;font-size:13px;font-weight:bold;">
-   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/><path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/></svg>
-   Visto
- </span>`;
-
+ const htmlVisto = `<span style="display:inline-flex;align-items:center;gap:6px;color:#64748b;background:#f1f5f9;padding:7px 12px;border-radius:20px;font-size:13px;font-weight:bold;">👁️ Visto</span>`;
  if(!articulosVistosPorMi.includes(titulo)){
    art.vistas=(art.vistas||0)+1;
    articulosVistosPorMi.push(titulo);
@@ -262,17 +288,59 @@ function verArticulo(titulo){
    document.getElementById('mAviso').innerHTML = htmlVisto;
  }
 }
-function cerrarLectura(){document.getElementById('modalLectura').classList.remove('activo');renderPrincipal();}
+function cerrarLectura(){document.getElementById('modalLectura').classList.remove('activo');renderPrincipal(); renderPerfil();}
+
 function crearArticulo(){
+ let sesion=getSesion();
  let titulo=nTitulo.value.trim(), cat=nCat.value, autor=nAutor.value.trim(), desc=nDesc.value.trim(), tipo=tipoContenido.value, contenido=nResumen.value.trim(), link="";
  if(tipo=='link') link=nLink.value.trim();
  if(tipo=='pdf') link=nPdfLink.value.trim();
  if(!titulo||!cat||!autor||!desc){alert("Falta título, disciplina, autor y descripción");return}
- let nuevo={titulo,cat,desc,contenido,autor,tipo,link,vistas:0};
- articulos.unshift(nuevo);
+
+ if(indiceEditando!==null){
+   // MODO EDICIÓN
+   let art = articulos[indiceEditando];
+   art.titulo=titulo; art.cat=cat; art.desc=desc; art.contenido=contenido; art.autor=autor; art.tipo=tipo; art.link=link;
+   indiceEditando=null;
+   alert("Artículo actualizado");
+ } else {
+   // MODO CREAR
+   let nuevo={titulo,cat,desc,contenido,autor,tipo,link,vistas:0, owner: sesion.usuario, ownerCorreo: sesion.correo, fecha: new Date().toLocaleDateString()};
+   articulos.unshift(nuevo);
+ }
  localStorage.setItem('articulosU',JSON.stringify(articulos));
- alert("Publicado en "+cat);
- irA('principal');
+ // limpiar
+ nTitulo.value=""; nCat.value=""; nAutor.value=""; nDesc.value=""; nResumen.value=""; nLink.value=""; nPdfLink.value="";
+ tituloCrear.innerText="➕ Nuevo Artículo"; btnPublicar.innerText="Publicar";
+ irA('perfil');
+}
+
+function borrarArticulo(idx){
+ if(!confirm("¿Seguro que quieres borrar este artículo? Esta acción no se puede deshacer.")) return;
+ let tituloBorrado = articulos[idx].titulo;
+ articulos.splice(idx,1);
+ // también sacarlo de vistos
+ articulosVistosPorMi = articulosVistosPorMi.filter(t=>t!==tituloBorrado);
+ localStorage.setItem('articulosU',JSON.stringify(articulos));
+ localStorage.setItem('articulosVistosPorMi',JSON.stringify(articulosVistosPorMi));
+ renderPerfil();
+ renderPrincipal();
+}
+
+function editarArticulo(idx){
+ let art=articulos[idx];
+ let sesion=getSesion();
+ if(art.ownerCorreo && art.ownerCorreo!==sesion.correo && art.owner!==sesion.usuario){
+   alert("No puedes editar un artículo que no es tuyo"); return;
+ }
+ indiceEditando = idx;
+ nTitulo.value=art.titulo; nCat.value=art.cat; nAutor.value=art.autor; nDesc.value=art.desc;
+ tipoContenido.value=art.tipo||'texto'; cambiarTipo();
+ if(art.tipo=='link') nLink.value=art.link;
+ if(art.tipo=='pdf') nPdfLink.value=art.link;
+ if(art.tipo=='texto' ||!art.tipo) nResumen.value=art.contenido||"";
+ tituloCrear.innerText="✏️ Editando artículo"; btnPublicar.innerText="Guardar cambios";
+ irA('crear');
 }
 function filtrar(){
  let q=buscadorDisc.value.toLowerCase();
