@@ -24,6 +24,7 @@ input,select,textarea{width:100%;padding:12px;margin:7px 0;border-radius:10px;bo
 .login-box{min-height:90vh;display:flex;flex-direction:column;justify-content:center;padding:20px;background:white}
 .destacado{border-left:5px solid #f59e0b}
 .badge-vistas{background:#fef3c7;color:#92400e;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:bold}
+.badge-visto{background:#f1f5f9;color:#64748b;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:bold;display:inline-flex;align-items:center;gap:4px}
 .modal{position:fixed;top:0;left:0;right:0;bottom:0;background:white;z-index:200;overflow-y:auto;padding:20px;display:none}
 .modal.activo{display:block}
 </style>
@@ -143,12 +144,11 @@ input,select,textarea{width:100%;padding:12px;margin:7px 0;border-radius:10px;bo
 <p id="mDesc" style="margin-top:12px;line-height:1.6;white-space:pre-wrap"></p>
 <div id="mContenido" style="background:#f8fafc;padding:12px;border-radius:10px;margin-top:12px;white-space:pre-wrap"></div>
 <a id="mLink" target="_blank" class="btn" style="display:none;margin-top:16px;text-align:center;text-decoration:none">🔗 Abrir enlace / PDF</a>
-<p id="mAviso" style="margin-top:16px;font-size:12px;color:#16a34a;font-weight:bold"></p>
+<div id="mAviso" style="margin-top:16px;"></div>
 </div>
 
 <script>
 let articulos = JSON.parse(localStorage.getItem('articulosU')||'[]');
-// ESTO GUARDA QUÉ PERSONA YA VIO QUÉ ARTÍCULO - SOLO 1 VEZ EN LA VIDA
 let articulosVistosPorMi = JSON.parse(localStorage.getItem('articulosVistosPorMi')||'[]');
 
 function cambiarTipo(){
@@ -167,7 +167,7 @@ function iniciarSesion(){
 function mostrarApp(sesion){
  loginScreen.classList.add('hidden');
  appPrincipal.classList.remove('hidden');
- headerNombre.innerText="U-Ayuda"; // YA NO DICE Cprmxx3x
+ headerNombre.innerText="U-Ayuda";
  sideUser.innerText="Hola, "+sesion.usuario;
  pCorreo.innerText=sesion.correo;
  pUsuario.innerText=sesion.usuario;
@@ -207,22 +207,27 @@ function renderDestacados(){
  let cont=document.getElementById('listaDestacados');
  if(articulos.length==0){cont.innerHTML='<small style="color:gray">Aún no hay artículos</small>';return}
  let ordenados=[...articulos].sort((a,b)=>(b.vistas||0)-(a.vistas||0)).slice(0,3);
- cont.innerHTML=ordenados.map(a=>`
+ cont.innerHTML=ordenados.map(a=>{
+  let yaVisto = articulosVistosPorMi.includes(a.titulo);
+  return `
   <div class="card destacado" style="margin:10px 0">
-   <span class="badge-vistas">👁️ ${a.vistas||0} personas • 🔥 Destacado</span>
+   <span class="badge-vistas">👁️ ${a.vistas||0} personas • 🔥 Destacado</span> ${yaVisto ? '<span class="badge-visto">👁️ Visto</span>' : ''}
    <h3 style="margin:8px 0">${a.titulo}</h3>
    <small>${a.cat} | ${a.autor}</small>
    <p style="font-size:13px">${a.desc}</p>
    <button class="btn" style="background:#f1f5f9;color:#1e293b" onclick="verArticulo('${a.titulo.replace(/'/g,"\\'")}')">📖 Abrir artículo</button>
   </div>
- `).join('');
+ `}).join('');
 }
 function renderLista(lista,contId){
  let cont=document.getElementById(contId);
  if(lista.length==0){cont.innerHTML='<div class="card">No hay artículos aún</div>';return}
  cont.innerHTML=lista.map(a=>{
+  let yaVisto = articulosVistosPorMi.includes(a.titulo);
   return `<div class="card">
-   <span style="background:#e0e7ff;padding:3px 8px;border-radius:10px;font-size:11px">${a.cat}</span> <span class="badge-vistas">👁️ ${a.vistas||0} personas</span>
+   <span style="background:#e0e7ff;padding:3px 8px;border-radius:10px;font-size:11px">${a.cat}</span> 
+   <span class="badge-vistas">👁️ ${a.vistas||0} personas</span>
+   ${yaVisto ? '<span class="badge-visto">👁️ Visto</span>' : ''}
    <h3>${a.titulo}</h3><small>${a.autor}</small><p style="font-size:13px;margin-top:6px">${a.desc}</p>
    <button class="btn" style="background:#f1f5f9;color:#1e293b;margin-top:10px" onclick="verArticulo('${a.titulo.replace(/'/g,"\\'")}')">📖 Abrir artículo</button>
   </div>`;
@@ -232,26 +237,29 @@ function verArticulo(titulo){
  let art=articulos.find(a=>a.titulo==titulo);
  if(!art) return;
 
- // 1. ABRIR PRIMERO
  document.getElementById('mTitulo').innerText=art.titulo;
  document.getElementById('mMeta').innerText=art.cat+" • "+art.autor+" • "+(art.vistas||0)+" personas lo han leído";
  document.getElementById('mDesc').innerText=art.desc;
  document.getElementById('mContenido').innerText=art.contenido||"";
  let ml=document.getElementById('mLink');
  if(art.link){ml.href=art.link;ml.style.display='block';} else {ml.style.display='none';}
- document.getElementById('mAviso').innerText="";
  document.getElementById('modalLectura').classList.add('activo');
 
- // 2. LOGICA QUE PEDISTE: SOLO 1 VISTA POR PERSONA EN TODA LA VIDA
+ // ESTILO TIPO SIMA - SOLO OJITO VISTO
+ const htmlVisto = `<span style="display:inline-flex;align-items:center;gap:6px;color:#64748b;background:#f1f5f9;padding:7px 12px;border-radius:20px;font-size:13px;font-weight:bold;">
+   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/><path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/></svg>
+   Visto
+ </span>`;
+
  if(!articulosVistosPorMi.includes(titulo)){
    art.vistas=(art.vistas||0)+1;
    articulosVistosPorMi.push(titulo);
    localStorage.setItem('articulosU',JSON.stringify(articulos));
    localStorage.setItem('articulosVistosPorMi',JSON.stringify(articulosVistosPorMi));
    document.getElementById('mMeta').innerText=art.cat+" • "+art.autor+" • "+(art.vistas||0)+" personas lo han leído";
-   document.getElementById('mAviso').innerText="✅ +1 vista contada (eres una persona nueva)";
+   document.getElementById('mAviso').innerHTML = htmlVisto;
  } else {
-   document.getElementById('mAviso').innerText="ℹ️ Ya habías leído este artículo, no se suma otra vista (como pediste)";
+   document.getElementById('mAviso').innerHTML = htmlVisto;
  }
 }
 function cerrarLectura(){document.getElementById('modalLectura').classList.remove('activo');renderPrincipal();}
